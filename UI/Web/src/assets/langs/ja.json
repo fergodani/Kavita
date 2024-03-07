@@ -241,6 +241,7 @@
     },
     "actionable": {
         "edit": "編集",
+        "notes": "Notes",
         "delete": "削除",
         "download": "ダウンロード",
         "clear": "{{common.clear}}",

@@ -97,6 +97,7 @@ export enum Action {
   RemoveRuleGroup = 21,
   MarkAsVisible = 22,
   MarkAsInvisible = 23,
+  Notes = 24
 }
 
 export interface ActionItem<T> {
@@ -464,6 +465,13 @@ export class ActionFactoryService {
         requiresAdmin: false,
         children: [],
       },
+      {
+        action: Action.Notes,
+        title: 'notes',
+        callback: this.dummyCallback,
+        requiresAdmin: false,
+        children: [],
+      },
     ];
 
     this.chapterActions = [
@@ -532,6 +540,13 @@ export class ActionFactoryService {
       {
         action: Action.Edit,
         title: 'details',
+        callback: this.dummyCallback,
+        requiresAdmin: false,
+        children: [],
+      },
+      {
+        action: Action.Notes,
+        title: 'notes',
         callback: this.dummyCallback,
         requiresAdmin: false,
         children: [],

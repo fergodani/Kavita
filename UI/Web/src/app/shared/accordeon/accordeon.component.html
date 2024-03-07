@@ -1,0 +1,16 @@
+<ul>
+    <li class="acordeon-item"  *ngFor="let item of items">
+      <div class="acordeon-item-content bg-secondary"(click)="toggleAccordion(item)">
+        {{ item.title }}
+        <i class="fa-solid fa-chevron-up acordeon-item-toggle" *ngIf="item.expanded"></i>
+        <i class="fa-solid fa-chevron-down acordeon-item-toggle" *ngIf="!item.expanded"></i>
+      </div> 
+      <div class="acordeon-item-content" *ngIf="item.children && item.expanded" >
+        <textarea class="form-control mb-2"  rows="10"
+                             aria-describedby="body-validations"
+                             [(ngModel)]="item.note"
+                  ></textarea>
+        <app-accordeon [items]="item.children"></app-accordeon>
+      </div>
+    </li>
+  </ul>

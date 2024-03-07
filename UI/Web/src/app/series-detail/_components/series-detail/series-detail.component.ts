@@ -24,9 +24,9 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Title} from '@angular/platform-browser';
-import {ActivatedRoute, Router} from '@angular/router';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   NgbDropdown,
   NgbDropdownItem,
@@ -43,80 +43,80 @@ import {
   NgbProgressbar,
   NgbTooltip
 } from '@ng-bootstrap/ng-bootstrap';
-import {ToastrService} from 'ngx-toastr';
-import {catchError, forkJoin, Observable, of} from 'rxjs';
-import {map, take} from 'rxjs/operators';
-import {BulkSelectionService} from 'src/app/cards/bulk-selection.service';
-import {CardDetailDrawerComponent} from 'src/app/cards/card-detail-drawer/card-detail-drawer.component';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+import { BulkSelectionService } from 'src/app/cards/bulk-selection.service';
+import { CardDetailDrawerComponent } from 'src/app/cards/card-detail-drawer/card-detail-drawer.component';
 import {
   EditSeriesModalCloseResult,
   EditSeriesModalComponent
 } from 'src/app/cards/_modals/edit-series-modal/edit-series-modal.component';
-import {TagBadgeCursor} from 'src/app/shared/tag-badge/tag-badge.component';
-import {DownloadEvent, DownloadService} from 'src/app/shared/_services/download.service';
-import {KEY_CODES, UtilityService} from 'src/app/shared/_services/utility.service';
-import {Chapter} from 'src/app/_models/chapter';
-import {Device} from 'src/app/_models/device/device';
-import {ScanSeriesEvent} from 'src/app/_models/events/scan-series-event';
-import {SeriesRemovedEvent} from 'src/app/_models/events/series-removed-event';
-import {LibraryType} from 'src/app/_models/library/library';
-import {ReadingList} from 'src/app/_models/reading-list';
-import {Series} from 'src/app/_models/series';
-import {RelatedSeries} from 'src/app/_models/series-detail/related-series';
-import {RelationKind} from 'src/app/_models/series-detail/relation-kind';
-import {SeriesMetadata} from 'src/app/_models/metadata/series-metadata';
-import {User} from 'src/app/_models/user';
-import {Volume} from 'src/app/_models/volume';
-import {LooseLeafOrSpecialNumber} from 'src/app/_models/chapter';
-import {AccountService} from 'src/app/_services/account.service';
-import {Action, ActionFactoryService, ActionItem} from 'src/app/_services/action-factory.service';
-import {ActionService} from 'src/app/_services/action.service';
-import {DeviceService} from 'src/app/_services/device.service';
-import {ImageService} from 'src/app/_services/image.service';
-import {LibraryService} from 'src/app/_services/library.service';
-import {EVENTS, MessageHubService} from 'src/app/_services/message-hub.service';
-import {NavService} from 'src/app/_services/nav.service';
-import {ReaderService} from 'src/app/_services/reader.service';
-import {ReadingListService} from 'src/app/_services/reading-list.service';
-import {ScrollService} from 'src/app/_services/scroll.service';
-import {SeriesService} from 'src/app/_services/series.service';
+import { TagBadgeCursor } from 'src/app/shared/tag-badge/tag-badge.component';
+import { DownloadEvent, DownloadService } from 'src/app/shared/_services/download.service';
+import { KEY_CODES, UtilityService } from 'src/app/shared/_services/utility.service';
+import { Chapter } from 'src/app/_models/chapter';
+import { Device } from 'src/app/_models/device/device';
+import { ScanSeriesEvent } from 'src/app/_models/events/scan-series-event';
+import { SeriesRemovedEvent } from 'src/app/_models/events/series-removed-event';
+import { LibraryType } from 'src/app/_models/library/library';
+import { ReadingList } from 'src/app/_models/reading-list';
+import { Series } from 'src/app/_models/series';
+import { RelatedSeries } from 'src/app/_models/series-detail/related-series';
+import { RelationKind } from 'src/app/_models/series-detail/relation-kind';
+import { SeriesMetadata } from 'src/app/_models/metadata/series-metadata';
+import { User } from 'src/app/_models/user';
+import { Volume } from 'src/app/_models/volume';
+import { LooseLeafOrSpecialNumber } from 'src/app/_models/chapter';
+import { AccountService } from 'src/app/_services/account.service';
+import { Action, ActionFactoryService, ActionItem } from 'src/app/_services/action-factory.service';
+import { ActionService } from 'src/app/_services/action.service';
+import { DeviceService } from 'src/app/_services/device.service';
+import { ImageService } from 'src/app/_services/image.service';
+import { LibraryService } from 'src/app/_services/library.service';
+import { EVENTS, MessageHubService } from 'src/app/_services/message-hub.service';
+import { NavService } from 'src/app/_services/nav.service';
+import { ReaderService } from 'src/app/_services/reader.service';
+import { ReadingListService } from 'src/app/_services/reading-list.service';
+import { ScrollService } from 'src/app/_services/scroll.service';
+import { SeriesService } from 'src/app/_services/series.service';
 import {
   ReviewSeriesModalCloseAction,
   ReviewSeriesModalCloseEvent,
   ReviewSeriesModalComponent
 } from '../../../_single-module/review-series-modal/review-series-modal.component';
-import {PageLayoutMode} from 'src/app/_models/page-layout-mode';
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {UserReview} from "../../../_single-module/review-card/user-review";
-import {LoadingComponent} from '../../../shared/loading/loading.component';
-import {ExternalListItemComponent} from '../../../cards/external-list-item/external-list-item.component';
-import {ExternalSeriesCardComponent} from '../../../cards/external-series-card/external-series-card.component';
-import {SeriesCardComponent} from '../../../cards/series-card/series-card.component';
-import {EntityTitleComponent} from '../../../cards/entity-title/entity-title.component';
-import {ListItemComponent} from '../../../cards/list-item/list-item.component';
-import {CardItemComponent} from '../../../cards/card-item/card-item.component';
-import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
-import {BulkOperationsComponent} from '../../../cards/bulk-operations/bulk-operations.component';
-import {ReviewCardComponent} from '../../../_single-module/review-card/review-card.component';
-import {CarouselReelComponent} from '../../../carousel/_components/carousel-reel/carousel-reel.component';
-import {SeriesMetadataDetailComponent} from '../series-metadata-detail/series-metadata-detail.component';
-import {ImageComponent} from '../../../shared/image/image.component';
-import {TagBadgeComponent} from '../../../shared/tag-badge/tag-badge.component';
+import { PageLayoutMode } from 'src/app/_models/page-layout-mode';
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { UserReview } from "../../../_single-module/review-card/user-review";
+import { LoadingComponent } from '../../../shared/loading/loading.component';
+import { ExternalListItemComponent } from '../../../cards/external-list-item/external-list-item.component';
+import { ExternalSeriesCardComponent } from '../../../cards/external-series-card/external-series-card.component';
+import { SeriesCardComponent } from '../../../cards/series-card/series-card.component';
+import { EntityTitleComponent } from '../../../cards/entity-title/entity-title.component';
+import { ListItemComponent } from '../../../cards/list-item/list-item.component';
+import { CardItemComponent } from '../../../cards/card-item/card-item.component';
+import { VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
+import { BulkOperationsComponent } from '../../../cards/bulk-operations/bulk-operations.component';
+import { ReviewCardComponent } from '../../../_single-module/review-card/review-card.component';
+import { CarouselReelComponent } from '../../../carousel/_components/carousel-reel/carousel-reel.component';
+import { SeriesMetadataDetailComponent } from '../series-metadata-detail/series-metadata-detail.component';
+import { ImageComponent } from '../../../shared/image/image.component';
+import { TagBadgeComponent } from '../../../shared/tag-badge/tag-badge.component';
 import {
   SideNavCompanionBarComponent
 } from '../../../sidenav/_components/side-nav-companion-bar/side-nav-companion-bar.component';
-import {TranslocoDirective, TranslocoService} from "@ngneat/transloco";
-import {CardActionablesComponent} from "../../../_single-module/card-actionables/card-actionables.component";
-import {ExternalSeries} from "../../../_models/series-detail/external-series";
+import { TranslocoDirective, TranslocoService } from "@ngneat/transloco";
+import { CardActionablesComponent } from "../../../_single-module/card-actionables/card-actionables.component";
+import { ExternalSeries } from "../../../_models/series-detail/external-series";
 import {
   SeriesPreviewDrawerComponent
 } from "../../../_single-module/series-preview-drawer/series-preview-drawer.component";
-import {PublicationStatus} from "../../../_models/metadata/publication-status";
-import {NextExpectedChapter} from "../../../_models/series-detail/next-expected-chapter";
-import {NextExpectedCardComponent} from "../../../cards/next-expected-card/next-expected-card.component";
-import {ProviderImagePipe} from "../../../_pipes/provider-image.pipe";
-import {MetadataService} from "../../../_services/metadata.service";
-import {Rating} from "../../../_models/rating";
+import { PublicationStatus } from "../../../_models/metadata/publication-status";
+import { NextExpectedChapter } from "../../../_models/series-detail/next-expected-chapter";
+import { NextExpectedCardComponent } from "../../../cards/next-expected-card/next-expected-card.component";
+import { ProviderImagePipe } from "../../../_pipes/provider-image.pipe";
+import { MetadataService } from "../../../_services/metadata.service";
+import { Rating } from "../../../_models/rating";
 
 interface RelatedSeriesPair {
   series: Series;
@@ -139,11 +139,11 @@ interface StoryLineItem {
 }
 
 @Component({
-    selector: 'app-series-detail',
-    templateUrl: './series-detail.component.html',
-    styleUrls: ['./series-detail.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
+  selector: 'app-series-detail',
+  templateUrl: './series-detail.component.html',
+  styleUrls: ['./series-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
   imports: [NgIf, SideNavCompanionBarComponent, CardActionablesComponent, ReactiveFormsModule, NgStyle,
     TagBadgeComponent, ImageComponent, NgbTooltip, NgbProgressbar, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu,
     NgbDropdownItem, SeriesMetadataDetailComponent, CarouselReelComponent, ReviewCardComponent, BulkOperationsComponent,
@@ -269,10 +269,10 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
    */
   combinedRecs: Array<any> = [];
 
-  sortingOptions: Array<{value: string, text: string}> = [
-    {value: 'Storyline', text: 'Storyline'},
-    {value: 'Release', text: 'Release'},
-    {value: 'Added', text: 'Added'},
+  sortingOptions: Array<{ value: string, text: string }> = [
+    { value: 'Storyline', text: 'Storyline' },
+    { value: 'Release', text: 'Release' },
+    { value: 'Added', text: 'Added' },
   ];
   renderMode: PageLayoutMode = PageLayoutMode.Cards;
 
@@ -320,7 +320,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
         });
         break;
       case Action.MarkAsRead:
-        this.actionService.markMultipleAsRead(seriesId, selectedVolumeIds, chapters,  () => {
+        this.actionService.markMultipleAsRead(seriesId, selectedVolumeIds, chapters, () => {
           this.setContinuePoint();
           this.bulkSelectionService.deselectAll();
           this.cdRef.markForCheck();
@@ -328,7 +328,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
 
         break;
       case Action.MarkAsUnread:
-        this.actionService.markMultipleAsUnread(seriesId, selectedVolumeIds, chapters,  () => {
+        this.actionService.markMultipleAsUnread(seriesId, selectedVolumeIds, chapters, () => {
           this.setContinuePoint();
           this.bulkSelectionService.deselectAll();
           this.cdRef.markForCheck();
@@ -464,30 +464,30 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
 
   handleSeriesActionCallback(action: ActionItem<Series>, series: Series) {
     this.cdRef.markForCheck();
-    switch(action.action) {
-      case(Action.MarkAsRead):
+    switch (action.action) {
+      case (Action.MarkAsRead):
         this.actionService.markSeriesAsRead(series, (series: Series) => {
           this.loadSeries(series.id);
         });
         break;
-      case(Action.MarkAsUnread):
+      case (Action.MarkAsUnread):
         this.actionService.markSeriesAsUnread(series, (series: Series) => {
           this.loadSeries(series.id);
         });
         break;
-      case(Action.Scan):
+      case (Action.Scan):
         this.actionService.scanSeries(series);
         break;
-      case(Action.RefreshMetadata):
+      case (Action.RefreshMetadata):
         this.actionService.refreshMetdata(series);
         break;
-      case(Action.Delete):
+      case (Action.Delete):
         this.deleteSeries(series);
         break;
-      case(Action.AddToReadingList):
+      case (Action.AddToReadingList):
         this.actionService.addSeriesToReadingList(series);
         break;
-      case(Action.AddToCollection):
+      case (Action.AddToCollection):
         this.actionService.addMultipleSeriesToCollectionTag([series]);
         break;
       case (Action.AnalyzeFiles):
@@ -516,20 +516,20 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
   }
 
   handleVolumeActionCallback(action: ActionItem<Volume>, volume: Volume) {
-    switch(action.action) {
-      case(Action.MarkAsRead):
+    switch (action.action) {
+      case (Action.MarkAsRead):
         this.markVolumeAsRead(volume);
         break;
-      case(Action.MarkAsUnread):
+      case (Action.MarkAsUnread):
         this.markVolumeAsUnread(volume);
         break;
-      case(Action.Edit):
+      case (Action.Edit):
         this.openViewInfo(volume);
         break;
-      case(Action.AddToReadingList):
+      case (Action.AddToReadingList):
         this.actionService.addVolumeToReadingList(volume, this.seriesId, () => {/* No Operation */ });
         break;
-      case(Action.IncognitoRead):
+      case (Action.IncognitoRead):
         if (volume.chapters != undefined && volume.chapters?.length >= 1) {
           this.openChapter(volume.chapters.sort(this.utilityService.sortChapters)[0], true);
         }
@@ -540,6 +540,9 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
           this.actionService.sendToDevice(volume.chapters.map(c => c.id), device);
           break;
         }
+      case (Action.Notes):
+        this.router.navigateByUrl('/library/' + this.libraryId + "/series/" + this.seriesId + "/book/" + volume.id + "/notes");
+        break;
       default:
         break;
     }
@@ -547,29 +550,32 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
 
   handleChapterActionCallback(action: ActionItem<Chapter>, chapter: Chapter) {
     switch (action.action) {
-      case(Action.MarkAsRead):
+      case (Action.MarkAsRead):
         this.markChapterAsRead(chapter);
         break;
-      case(Action.MarkAsUnread):
+      case (Action.MarkAsUnread):
         this.markChapterAsUnread(chapter);
         break;
-      case(Action.Edit):
+      case (Action.Edit):
         this.openViewInfo(chapter);
         break;
-      case(Action.AddToReadingList):
+      case (Action.AddToReadingList):
         this.actionService.addChapterToReadingList(chapter, this.seriesId, () => {/* No Operation */ });
         break;
-      case(Action.IncognitoRead):
+      case (Action.IncognitoRead):
         this.openChapter(chapter, true);
         break;
       case (Action.SendTo):
         {
           const device = (action._extra!.data as Device);
           this.deviceService.sendTo([chapter.id], device.id).subscribe(() => {
-            this.toastr.success(this.translocoService.translate('series-detail.send-to', {deviceName: device.name}));
+            this.toastr.success(this.translocoService.translate('series-detail.send-to', { deviceName: device.name }));
           });
           break;
         }
+        case (Action.Notes):
+          this.router.navigateByUrl('/library/' + this.libraryId + "/series/" + this.seriesId + "/book/" + chapter.id + "/notes");
+          break;
       default:
         break;
     }
@@ -639,7 +645,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
       this.titleService.setTitle('Kavita - ' + this.series.name + ' Details');
 
       this.seriesActions = this.actionFactoryService.getSeriesActions(this.handleSeriesActionCallback.bind(this))
-              .filter(action => action.action !== Action.Edit);
+        .filter(action => action.action !== Action.Edit);
 
       this.volumeActions = this.actionFactoryService.getVolumeActions(this.handleVolumeActionCallback.bind(this));
       this.chapterActions = this.actionFactoryService.getChapterActions(this.handleChapterActionCallback.bind(this));
@@ -687,11 +693,11 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
         this.storyChapters = detail.storylineChapters;
         this.storylineItems = [];
         const v = this.volumes.map(v => {
-          return {volume: v, chapter: undefined, isChapter: false} as StoryLineItem;
+          return { volume: v, chapter: undefined, isChapter: false } as StoryLineItem;
         });
         this.storylineItems.push(...v);
         const c = this.storyChapters.map(c => {
-          return {volume: undefined, chapter: c, isChapter: true} as StoryLineItem;
+          return { volume: undefined, chapter: c, isChapter: true } as StoryLineItem;
         });
         this.storylineItems.push(...c);
 
@@ -706,7 +712,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
   }
 
   createRelatedSeries(series: Series, relation: RelationKind) {
-    return {series, relation} as RelatedSeriesPair;
+    return { series, relation } as RelatedSeriesPair;
   }
 
   /**
@@ -829,7 +835,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
       this.toastr.error(this.translocoService.translate('series-detail.no-pages'));
       return;
     }
-    this.router.navigate(this.readerService.getNavigationArray(this.libraryId, this.seriesId, chapter.id, chapter.files[0].format), {queryParams: {incognitoMode}});
+    this.router.navigate(this.readerService.getNavigationArray(this.libraryId, this.seriesId, chapter.id, chapter.files[0].format), { queryParams: { incognitoMode } });
   }
 
   openVolume(volume: Volume) {
@@ -856,7 +862,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
   }
 
   openViewInfo(data: Volume | Chapter) {
-    const drawerRef = this.offcanvasService.open(CardDetailDrawerComponent, {position: 'bottom'});
+    const drawerRef = this.offcanvasService.open(CardDetailDrawerComponent, { position: 'bottom' });
     drawerRef.componentInstance.data = data;
     drawerRef.componentInstance.parentName = this.series?.name;
     drawerRef.componentInstance.seriesId = this.series?.id;
@@ -864,7 +870,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
   }
 
   openEditSeriesModal() {
-    const modalRef = this.modalService.open(EditSeriesModalComponent, {  size: 'xl' });
+    const modalRef = this.modalService.open(EditSeriesModalComponent, { size: 'xl' });
     modalRef.componentInstance.series = this.series;
     modalRef.closed.subscribe((closeResult: EditSeriesModalCloseResult) => {
       if (closeResult.success) {
@@ -908,7 +914,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
 
     const index = this.reviews.findIndex(r => r.username === closeResult.review!.username);
     if (closeResult.action === ReviewSeriesModalCloseAction.Edit) {
-      if (index === -1 ) {
+      if (index === -1) {
         // A new series was added:
         this.reviews = [closeResult.review, ...this.reviews];
         this.cdRef.markForCheck();
@@ -958,7 +964,7 @@ export class SeriesDetailComponent implements OnInit, AfterContentChecked {
   }
 
   previewSeries(item: Series | ExternalSeries, isExternal: boolean) {
-    const ref = this.offcanvasService.open(SeriesPreviewDrawerComponent, {position: 'end', panelClass: 'navbar-offset'});
+    const ref = this.offcanvasService.open(SeriesPreviewDrawerComponent, { position: 'end', panelClass: 'navbar-offset' });
     ref.componentInstance.isExternalSeries = isExternal;
     ref.componentInstance.name = item.name;
 

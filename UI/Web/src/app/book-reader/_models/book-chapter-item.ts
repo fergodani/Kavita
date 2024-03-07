@@ -3,4 +3,6 @@ export interface BookChapterItem {
     page: number;
     part: string;
     children: Array<BookChapterItem>;
+    expanded?: boolean;
+    note?: string;
 }
