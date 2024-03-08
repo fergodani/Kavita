@@ -1,6 +1,11 @@
-ul {
-    list-style-type: none;
-  }
-  li {
-    cursor: pointer;
-  }
+.float-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+}

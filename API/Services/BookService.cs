@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using API.Data;
 using API.Data.Metadata;
+using API.Data.Repositories;
 using API.DTOs.Reader;
 using API.Entities;
 using API.Entities.Enums;
@@ -20,6 +22,7 @@ using ExCSS;
 using HtmlAgilityPack;
 using Kavita.Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.IO;
 using Nager.ArticleNumber;
 using SixLabors.ImageSharp;
@@ -57,12 +60,14 @@ public interface IBookService
     Task<ICollection<BookChapterItem>> GenerateTableOfContents(Chapter chapter);
     Task<string> GetBookPage(int page, int chapterId, string cachedEpubPath, string baseUrl);
     Task<Dictionary<string, int>> CreateKeyToPageMappingAsync(EpubBookRef book);
+    void SaveUserBookNote(IList<BookChapterItem> bookChapterItems, AppUser user, int chapterId);
 }
 
 public class BookService : IBookService
 {
     private readonly ILogger<BookService> _logger;
     private readonly IDirectoryService _directoryService;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IImageService _imageService;
     private readonly IMediaErrorService _mediaErrorService;
     private readonly StylesheetParser _cssParser = new ();
@@ -77,12 +82,13 @@ public class BookService : IBookService
         }
     };
 
-    public BookService(ILogger<BookService> logger, IDirectoryService directoryService, IImageService imageService, IMediaErrorService mediaErrorService)
+    public BookService(ILogger<BookService> logger, IDirectoryService directoryService, IImageService imageService, IMediaErrorService mediaErrorService, IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _directoryService = directoryService;
         _imageService = imageService;
         _mediaErrorService = mediaErrorService;
+        _unitOfWork = unitOfWork;
     }
 
     private static bool HasClickableHrefPart(HtmlNode anchor)
@@ -1026,6 +1032,8 @@ public class BookService : IBookService
             }
         }
 
+        FetchNotes(chaptersList, chapter);
+        
         if (chaptersList.Count != 0) return chaptersList;
         // Generate from TOC from links (any point past this, Kavita is generating as a TOC doesn't exist)
         var tocPage = book.Content.Html.Local.Select(s => s.Key)
@@ -1045,8 +1053,6 @@ public class BookService : IBookService
         // We could do a fallback first with ol/lis
         //var sections = doc.DocumentNode.SelectNodes("//ol");
         //if (sections == null)
-
-
 
         var anchors = doc.DocumentNode.SelectNodes("//a");
         if (anchors == null) return chaptersList;
@@ -1081,6 +1087,20 @@ public class BookService : IBookService
         var matches = Regex.Matches(path, pattern);
 
         return matches.Count;
+    }
+
+    private async void FetchNotes(IList<BookChapterItem> chaptersList, Chapter chapter) {
+        foreach (var item in chaptersList)
+        {
+            var userBookNote = await _unitOfWork.UserBookNoteRepository.GetBookNoteByVolumeIdAndPage(chapter.Id, item.Page);
+            if (userBookNote != null)
+                item.Note = userBookNote.Note;
+            else
+                item.Note = "";
+            if (!item.Children.IsNullOrEmpty()) {
+                FetchNotes(item.Children.ToList(), chapter);
+            }
+        }
     }
 
     /// <summary>
@@ -1126,7 +1146,6 @@ public class BookService : IBookService
         var counter = 0;
         var doc = new HtmlDocument {OptionFixNestedTags = true};
 
-
         var bookPages = await book.GetReadingOrderAsync();
         try
         {
@@ -1171,7 +1190,7 @@ public class BookService : IBookService
         throw new KavitaException("epub-html-missing");
     }
 
-    private static void CreateToCChapter(EpubBookRef book, EpubNavigationItemRef navigationItem, IList<BookChapterItem> nestedChapters,
+    private static async void CreateToCChapter(EpubBookRef book, EpubNavigationItemRef navigationItem, IList<BookChapterItem> nestedChapters,
         ICollection<BookChapterItem> chaptersList, IReadOnlyDictionary<string, int> mappings)
     {
         if (navigationItem.Link == null)
@@ -1333,5 +1352,40 @@ public class BookService : IBookService
         {
             _logger.LogError("Line {LineNumber}, Reason: {Reason}", error.Line, error.Reason);
         }
+    }
+
+    public async void SaveUserBookNote(IList<BookChapterItem> bookChapterItems, AppUser user, int chapterId)
+    {
+        IterateUserBookNoteChildren(bookChapterItems, user, chapterId);
+    }
+
+    private async void IterateUserBookNoteChildren(IList<BookChapterItem> items, AppUser user, int chapterId)
+    {
+        foreach (var item in items)
+        {
+            if (item.Note != null)
+            {
+                var userBookNote = await _unitOfWork.UserBookNoteRepository
+                    .GetBookNoteByVolumeIdAndPage(chapterId, item.Page);
+                var exists = userBookNote != null;
+                if (!exists) {
+                    userBookNote = new UserBookNote();
+                }
+                userBookNote.Note = item.Note;
+                userBookNote.VolumeId = chapterId;
+                userBookNote.AppUserId = user.Id;
+                userBookNote.Page = item.Page;
+                if (!exists)
+                    _unitOfWork.UserBookNoteRepository.Add(userBookNote);
+                else
+                    _unitOfWork.UserBookNoteRepository.Update(userBookNote);
+                await _unitOfWork.CommitAsync();
+            }
+            if (!item.Children.IsNullOrEmpty())
+            {
+                IterateUserBookNoteChildren(item.Children.ToList(), user, chapterId);
+            }
+        }
+        
     }
 }

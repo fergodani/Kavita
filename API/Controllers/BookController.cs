@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Data.Repositories;
 using API.DTOs.Reader;
+using API.Entities;
 using API.Entities.Enums;
 using API.Extensions;
 using API.Services;
 using Kavita.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using VersOne.Epub;
 
 namespace API.Controllers;
@@ -164,4 +168,27 @@ public class BookController : BaseApiController
             return BadRequest(await _localizationService.Translate(User.GetUserId(), ex.Message));
         }
     }
+
+    /// <summary>
+    /// This creates or updates all the notes that user have done to each book chapter.
+    /// </summary>
+    /// <param name="chapterId"></param>
+    /// <param name="bookChapterItems"></param>
+    /// <returns></returns>
+    [HttpPost("{chapterId}/note")]
+    public async Task<ActionResult> UpdateBookNotes(int chapterId, IList<BookChapterItem> bookChapterItems)
+    {
+        var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+        if (user == null) return new UnauthorizedResult();
+        try {
+            _bookService.SaveUserBookNote(bookChapterItems, user, chapterId);
+            return Ok();
+        }
+        catch (KavitaException ex)
+        {
+            return BadRequest(await _localizationService.Translate(User.GetUserId(), ex.Message));
+        }
+    }
+
+
 }

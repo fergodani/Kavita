@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace API.DTOs.Reader;
 
@@ -16,5 +16,13 @@ public class BookChapterItem
     /// Page Number to load for the chapter
     /// </summary>
     public int Page { get; set; }
+    /// <summary>
+    /// Chapter user note
+    /// </summary>
+    public string Note { get; set; } = default!;
+    /// <summary>
+    /// Volume Id
+    /// </summary>
+    public int VolumeId { get; set; } = default!;
     public ICollection<BookChapterItem> Children { get; set; } = default!;
 }

@@ -45,5 +45,9 @@ export class BookService {
 
   getBookPageUrl(chapterId: number, page: number) {
     return this.baseUrl + 'book/' + chapterId + '/book-page?page=' + page;
+  } 
+
+  saveNotes(bookChapterItems: BookChapterItem[], chapterId: number) {
+    return this.http.post(this.baseUrl + 'book/' + chapterId + '/note', bookChapterItems);
   }
 }

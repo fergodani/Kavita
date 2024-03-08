@@ -1065,6 +1065,60 @@
         }
       }
     },
+    "/api/Book/{chapterId}/note": {
+      "post": {
+        "tags": [
+          "Book"
+        ],
+        "summary": "This creates or updates all the notes that user have done to each book chapter.",
+        "parameters": [
+          {
+            "name": "chapterId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BookChapterItem"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BookChapterItem"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BookChapterItem"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Cbl/validate": {
       "post": {
         "tags": [
@@ -12731,6 +12785,13 @@
             },
             "nullable": true
           },
+          "userBookNotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserBookNote"
+            },
+            "nullable": true
+          },
           "rowVersion": {
             "type": "integer",
             "format": "int32",
@@ -13389,6 +13450,16 @@
           "page": {
             "type": "integer",
             "description": "Page Number to load for the chapter",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string",
+            "description": "Chapter user note",
+            "nullable": true
+          },
+          "volumeId": {
+            "type": "integer",
+            "description": "Volume Id",
             "format": "int32"
           },
           "children": {
@@ -19998,6 +20069,52 @@
         },
         "additionalProperties": false
       },
+      "UserBookNote": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Volume chapter note",
+            "nullable": true
+          },
+          "page": {
+            "type": "integer",
+            "description": "Chapter page",
+            "format": "int32"
+          },
+          "volume": {
+            "$ref": "#/components/schemas/Volume"
+          },
+          "volumeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "appUser": {
+            "$ref": "#/components/schemas/AppUser"
+          },
+          "appUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
       "UserDto": {
         "type": "object",
         "properties": {
@@ -20448,6 +20565,13 @@
           "seriesId": {
             "type": "integer",
             "format": "int32"
+          },
+          "userBookNotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserBookNote"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

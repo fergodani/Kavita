@@ -1,4 +1,9 @@
 <div class="mx-auto px-4">
     <h2>{{bookInfo.bookTitle}}</h2>
+    <div class="mb-2">
+        <app-loading [loading]="isLoading"></app-loading>
+    </div>
     <app-accordeon [items]="chapter"></app-accordeon>
+    <button class="float-button btn-primary" (click)="saveNotes()">
+        <i class="fa-regular fa-floppy-disk"></i></button>
 </div>

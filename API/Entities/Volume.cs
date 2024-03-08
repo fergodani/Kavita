@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using API.Entities.Interfaces;
 
@@ -54,5 +54,7 @@ public class Volume : IEntityDate, IHasReadTimeEstimate
     // Relationships
     public Series Series { get; set; } = null!;
     public int SeriesId { get; set; }
+
+    public IList<UserBookNote> UserBookNotes { get; set; }
 
 }

@@ -1,7 +1,3 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using API.Entities;
 using API.Entities.Enums;
 using API.Entities.Enums.UserPreferences;
@@ -12,6 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace API.Data;
 
@@ -64,6 +64,7 @@ public sealed class DataContext : IdentityDbContext<AppUser, AppRole, int,
     public DbSet<ExternalRecommendation> ExternalRecommendation { get; set; } = null!;
     public DbSet<ManualMigrationHistory> ManualMigrationHistory { get; set; } = null!;
     public DbSet<SeriesBlacklist> SeriesBlacklist { get; set; } = null!;
+    public DbSet<UserBookNote> UserBookNote { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -149,9 +150,24 @@ public sealed class DataContext : IdentityDbContext<AppUser, AppRole, int,
             .WithOne(s => s.ExternalSeriesMetadata)
             .HasForeignKey<ExternalSeriesMetadata>(em => em.SeriesId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<UserBookNote>()
+            .HasOne(ub => ub.Volume)
+            .WithMany(v => v.UserBookNotes)
+            .HasForeignKey(ub => ub.VolumeId)
+            .IsRequired();
+
+        builder.Entity<UserBookNote>()
+           .HasOne(ub => ub.AppUser)
+           .WithMany(au => au.UserBookNotes)
+           .HasForeignKey(ub => ub.AppUserId)
+           .IsRequired();
+
+        builder.Entity<UserBookNote>()
+            .HasKey(ub => new { ub.VolumeId, ub.Page });
     }
 
-    #nullable enable
+#nullable enable
     private static void OnEntityTracked(object? sender, EntityTrackedEventArgs e)
     {
         if (e.FromQuery || e.Entry.State != EntityState.Added || e.Entry.Entity is not IEntityDate entity) return;
@@ -168,7 +184,7 @@ public sealed class DataContext : IdentityDbContext<AppUser, AppRole, int,
         entity.LastModified = DateTime.Now;
         entity.LastModifiedUtc = DateTime.UtcNow;
     }
-    #nullable disable
+#nullable disable
 
     private void OnSaveChanges()
     {
